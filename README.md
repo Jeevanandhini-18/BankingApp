@@ -1,4 +1,4 @@
-# Mini Banking API - Week 2
+# Mini Banking API - Week 2 and Week 3
 
 A Spring Boot REST API for customers, bank accounts, account transactions, and beneficiaries. Spring Data JPA and Hibernate persist the domain entities to PostgreSQL; tests use H2.
 
@@ -90,6 +90,19 @@ Import `postman/mini-banking-week2.postman_collection.json`. The create-customer
 - `beneficiaries` belongs to a customer.
 
 Transactions run atomically and lock the account row while changing its balance. The `schema.sql` file notes that Hibernate currently manages this exercise's schema; a production deployment should use versioned migrations and externally managed secrets.
+
+## Week 3 frontend
+
+The frontend is plain JavaScript served by Spring Boot from `src/main/resources/static`. It uses the same origin as the API, so no CORS configuration or separate frontend server is needed. The API base URL is configured in `static/js/config.js` using `window.location.origin`; when deployed on another host, the browser automatically uses that host's origin.
+
+Start PostgreSQL and Spring Boot using the commands above, then open `http://localhost:8080/`. The dashboard supports:
+
+- Customer list, detail lookup, and customer creation.
+- Account list, account creation, account details, transaction history, deposits, and withdrawals.
+- Beneficiary list, creation, and deletion.
+- API connection status, refresh, client-side form constraints, server validation messages, and request failure messages.
+
+The UI displays monetary values to two decimal places without assuming a currency, since the API does not currently model one. Browser-side checks improve form feedback; the backend remains responsible for authoritative validation.
 
 ## Git discipline
 

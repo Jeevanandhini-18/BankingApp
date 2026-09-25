@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f0">
+  <title>Ledger | Mini Banking</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/config.js" defer></script>
+  <script src="/js/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Ledger home">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span><strong>ledger</strong><small>MINI BANKING</small></span>
+      </a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-link is-active" type="button" data-view-target="overview" aria-current="page">
+          <span class="nav-glyph" aria-hidden="true">◫</span>Overview
+        </button>
+        <button class="nav-link" type="button" data-view-target="customers">
+          <span class="nav-glyph" aria-hidden="true">◎</span>Customers
+        </button>
+        <button class="nav-link" type="button" data-view-target="accounts">
+          <span class="nav-glyph" aria-hidden="true">▤</span>Accounts
+        </button>
+        <button class="nav-link" type="button" data-view-target="beneficiaries">
+          <span class="nav-glyph" aria-hidden="true">⇄</span>Beneficiaries
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="connection-dot" id="connection-dot"></span>
+        <span><strong id="connection-label">Connecting</strong><small>API connection</small></span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">MINI BANKING / WORKSPACE</p>
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="today-label" id="today-label"></span>
+          <button class="button button-quiet" type="button" data-action="refresh">Refresh data</button>
+        </div>
+      </header>
+
+      <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+
+      <section class="page-view" id="view-overview" data-view="overview">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow">YOUR BANKING AT A GLANCE</p>
+            <h2>Good work starts with a clear view.</h2>
+            <p class="muted">Accounts, customers, and recent activity in one place.</p>
+          </div>
+          <button class="button button-dark" type="button" data-view-target="customers">Add a customer <span aria-hidden="true">+</span></button>
+        </div>
+
+        <div class="summary-grid" aria-label="Banking summary">
+          <article class="summary-item summary-highlight">
+            <p>Total balances</p><strong id="summary-balance">--</strong><small>Across all accounts</small>
+          </article>
+          <article class="summary-item">
+            <p>Customers</p><strong id="summary-customers">--</strong><small>Registered profiles</small>
+          </article>
+          <article class="summary-item">
+            <p>Accounts</p><strong id="summary-accounts">--</strong><small>Open accounts</small>
+          </article>
+          <article class="summary-item">
+            <p>Beneficiaries</p><strong id="summary-beneficiaries">--</strong><small>Saved payees</small>
+          </article>
+        </div>
+
+        <div class="section-heading">
+          <div><p class="eyebrow">PORTFOLIO</p><h2>Accounts</h2></div>
+          <button class="text-button" type="button" data-view-target="accounts">View all accounts <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Account</th><th>Customer</th><th>Account number</th><th class="align-right">Balance</th><th></th></tr></thead>
+            <tbody id="overview-accounts"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page-view" id="view-customers" data-view="customers" hidden>
+        <div class="page-intro"><div><p class="eyebrow">CUSTOMER DIRECTORY</p><h2>Customers</h2><p class="muted">Create a profile or open a customer record.</p></div></div>
+        <div class="workspace-grid">
+          <section class="work-area" aria-labelledby="customer-list-title">
+            <div class="section-heading compact"><div><p class="eyebrow">DIRECTORY</p><h3 id="customer-list-title">All customers</h3></div><span class="count-label" id="customer-count">0 records</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th></th></tr></thead>
+                <tbody id="customers-table"></tbody>
+              </table>
+            </div>
+            <aside class="detail-strip" id="customer-detail" hidden aria-live="polite"></aside>
+          </section>
+          <section class="form-area" aria-labelledby="customer-form-title">
+            <p class="eyebrow">NEW PROFILE</p><h3 id="customer-form-title">Add customer</h3>
+            <form id="customer-form" novalidate>
+              <label>Full name<input name="fullName" autocomplete="name" maxlength="120" required placeholder="e.g. Ada Lovelace"><small class="field-error" data-error-for="fullName"></small></label>
+              <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required placeholder="name@example.com"><small class="field-error" data-error-for="email"></small></label>
+              <label>Phone <span class="optional">OPTIONAL</span><input name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="+1 555 0100"><small class="field-error" data-error-for="phone"></small></label>
+              <button class="button button-dark button-full" type="submit">Create customer</button>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section class="page-view" id="view-accounts" data-view="accounts" hidden>
+        <div class="page-intro"><div><p class="eyebrow">ACCOUNT MANAGEMENT</p><h2>Accounts</h2><p class="muted">Open an account to inspect its balance and transaction history.</p></div></div>
+        <div class="workspace-grid account-layout">
+          <section class="work-area" aria-labelledby="account-list-title">
+            <div class="section-heading compact"><div><p class="eyebrow">PORTFOLIO</p><h3 id="account-list-title">All accounts</h3></div><span class="count-label" id="account-count">0 records</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Account number</th><th>Customer</th><th class="align-right">Balance</th><th></th></tr></thead>
+                <tbody id="accounts-table"></tbody>
+              </table>
+            </div>
+            <section class="detail-panel" id="account-detail" hidden aria-live="polite">
+              <div class="detail-heading"><div><p class="eyebrow">ACCOUNT DETAIL</p><h3 id="detail-account-number">Select an account</h3></div><strong class="detail-balance" id="detail-account-balance"></strong></div>
+              <p class="muted" id="detail-account-owner"></p>
+              <div class="history-heading"><h4>Transaction history</h4><span class="count-label" id="transaction-count">0 entries</span></div>
+              <div class="transaction-list" id="transaction-list"></div>
+              <form id="transaction-form" class="transaction-form" novalidate>
+                <p class="eyebrow">RECORD ACTIVITY</p><h4>New transaction</h4>
+                <div class="form-row">
+                  <label>Type<select name="type" required><option value="DEPOSIT">Deposit</option><option value="WITHDRAWAL">Withdrawal</option></select><small class="field-error" data-error-for="type"></small></label>
+                  <label>Amount<input name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00"><small class="field-error" data-error-for="amount"></small></label>
+                </div>
+                <label>Description <span class="optional">OPTIONAL</span><input name="description" maxlength="240" placeholder="What is this for?"><small class="field-error" data-error-for="description"></small></label>
+                <button class="button button-dark" type="submit">Submit transaction</button>
+              </form>
+            </section>
+          </section>
+          <section class="form-area" aria-labelledby="account-form-title">
+            <p class="eyebrow">NEW ACCOUNT</p><h3 id="account-form-title">Open an account</h3>
+            <form id="account-form" novalidate>
+              <label>Customer<select name="customerId" required><option value="">Choose a customer</option></select><small class="field-error" data-error-for="customerId"></small></label>
+              <label>Opening balance<input name="initialBalance" type="number" min="0" step="0.01" required value="0.00"><small class="field-error" data-error-for="initialBalance"></small></label>
+              <p class="form-hint">Amounts are recorded to two decimal places.</p>
+              <button class="button button-dark button-full" type="submit">Create account</button>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section class="page-view" id="view-beneficiaries" data-view="beneficiaries" hidden>
+        <div class="page-intro"><div><p class="eyebrow">SAVED PAYEES</p><h2>Beneficiaries</h2><p class="muted">Manage the beneficiaries linked to your customers.</p></div></div>
+        <div class="workspace-grid">
+          <section class="work-area" aria-labelledby="beneficiary-list-title">
+            <div class="section-heading compact"><div><p class="eyebrow">DIRECTORY</p><h3 id="beneficiary-list-title">All beneficiaries</h3></div><span class="count-label" id="beneficiary-count">0 records</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Name</th><th>Customer</th><th>Bank</th><th>Account number</th><th></th></tr></thead>
+                <tbody id="beneficiaries-table"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="form-area" aria-labelledby="beneficiary-form-title">
+            <p class="eyebrow">NEW PAYEE</p><h3 id="beneficiary-form-title">Add beneficiary</h3>
+            <form id="beneficiary-form" novalidate>
+              <label>Customer<select name="customerId" required><option value="">Choose a customer</option></select><small class="field-error" data-error-for="customerId"></small></label>
+              <label>Beneficiary name<input name="name" maxlength="120" required placeholder="Full name"><small class="field-error" data-error-for="name"></small></label>
+              <label>Account number<input name="accountNumber" maxlength="34" required placeholder="Account number"><small class="field-error" data-error-for="accountNumber"></small></label>
+              <label>Bank name <span class="optional">OPTIONAL</span><input name="bankName" maxlength="120" placeholder="Bank"><small class="field-error" data-error-for="bankName"></small></label>
+              <button class="button button-dark button-full" type="submit">Save beneficiary</button>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <footer class="page-footer"><span>LEDGER / MINI BANKING</span><span>Amounts shown in account units</span></footer>
+    </main>
+  </div>
+</body>
+</html>
