@@ -1,0 +1,67 @@
+{
+  "info": {
+    "name": "Mini Banking - Week 2 CRUD API",
+    "description": "Customer, account, transaction, and beneficiary API requests. Run in order to populate the collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "customerId", "value": "" },
+    { "key": "accountId", "value": "" },
+    { "key": "beneficiaryId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        { "name": "Health", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/health" } },
+        { "name": "API Info", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/info" } }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Create customer",
+          "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('customerId', pm.response.json().id);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Ada Lovelace\",\n  \"email\": \"ada@example.com\",\n  \"phone\": \"555-0100\"\n}" }, "url": "{{baseUrl}}/api/customers" }
+        },
+        { "name": "List customers", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/customers" } },
+        { "name": "Get customer", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/customers/{{customerId}}" } }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Create account",
+          "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('accountId', pm.response.json().id);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"customerId\": {{customerId}},\n  \"initialBalance\": 100.00\n}" }, "url": "{{baseUrl}}/api/accounts" }
+        },
+        { "name": "List accounts", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/accounts" } },
+        { "name": "Get account", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/accounts/{{accountId}}" } },
+        {
+          "name": "Deposit",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"type\": \"DEPOSIT\",\n  \"amount\": 25.00,\n  \"description\": \"Initial deposit\"\n}" }, "url": "{{baseUrl}}/api/accounts/{{accountId}}/transactions" }
+        },
+        {
+          "name": "Withdraw",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"type\": \"WITHDRAWAL\",\n  \"amount\": 10.00,\n  \"description\": \"Cash withdrawal\"\n}" }, "url": "{{baseUrl}}/api/accounts/{{accountId}}/transactions" }
+        },
+        { "name": "List account transactions", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/accounts/{{accountId}}/transactions" } }
+      ]
+    },
+    {
+      "name": "Beneficiaries",
+      "item": [
+        {
+          "name": "Create beneficiary",
+          "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('beneficiaryId', pm.response.json().id);"], "type": "text/javascript" } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"customerId\": {{customerId}},\n  \"name\": \"Grace Hopper\",\n  \"accountNumber\": \"1234567890\",\n  \"bankName\": \"Example Bank\"\n}" }, "url": "{{baseUrl}}/api/beneficiaries" }
+        },
+        { "name": "List beneficiaries", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/beneficiaries" } },
+        { "name": "Delete beneficiary", "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/beneficiaries/{{beneficiaryId}}" } }
+      ]
+    }
+  ]
+}

@@ -30,7 +30,7 @@ public class SystemController {
         return new ApiInfoResponse(
                 "Mini Banking API",
                 "0.0.1-SNAPSHOT",
-                "Week 1 banking service is running"
+                "Week 2 banking API is running"
         );
     }
 }

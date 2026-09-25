@@ -1,132 +1,103 @@
-# Mini Banking API - Week 1
+# Mini Banking API - Week 2
 
-A minimal Spring Boot service for the Mini Banking / Open Banking Consent Management project.
-
-## Week 1 outcomes
-
-- Spring Boot REST API
-- PostgreSQL connection through Spring JDBC
-- Automated endpoint test using H2
-- Docker Compose setup for PostgreSQL and the application
-- Postman collection for the two starter endpoints
+A Spring Boot REST API for customers, bank accounts, account transactions, and beneficiaries. Spring Data JPA and Hibernate persist the domain entities to PostgreSQL; tests use H2.
 
 ## Prerequisites
 
 - Java 17 or later
-- Maven 3.9 or later, or IntelliJ IDEA / VS Code with Maven support
-- Docker Desktop for the Compose workflow
-- Git
+- Maven 3.9 or later
+- Docker Desktop for PostgreSQL / Compose
 - Postman (optional)
 
-This workspace currently has Java 26 and Git available. Maven and Docker were not available on PATH when this project was created, so install them before running the commands below.
-
-## Run the tests
+## Run tests
 
 ```powershell
 mvn test
 ```
 
-The tests use an in-memory H2 database, so PostgreSQL does not need to be running for the test suite.
+Tests use an in-memory H2 database and cover customer/account creation, deposits, transaction history, insufficient funds, validation, and beneficiary create/list/delete.
 
-## Run locally with PostgreSQL
+## Run with PostgreSQL
 
-Start only the database:
+Start PostgreSQL and the application locally:
 
 ```powershell
 docker compose up -d postgres
 mvn spring-boot:run
 ```
 
-Or build the JAR and run it:
+Or run the complete Compose stack:
 
 ```powershell
-mvn clean package
-java -jar target/mini-banking-0.0.1-SNAPSHOT.jar
-```
-
-The application reads these defaults:
-
-- URL: `jdbc:postgresql://localhost:5432/banking`
-- Database: `banking`
-- Username: `banking`
-- Password: `banking`
-- Port: `8080`
-
-For real projects, use environment variables or a secret manager instead of committing passwords.
-
-## Run everything with Docker Compose
-
-```powershell
-mvn clean package
 docker compose up --build
 ```
 
-Stop the containers:
+The default connection is `jdbc:postgresql://localhost:5432/banking` with database/user/password `banking`. Hibernate creates or updates the mapped tables on startup. Configure `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD` to use different credentials. These defaults are for local learning only.
 
-```powershell
-docker compose down
-```
+## API
 
-Add `-v` to the `down` command only when you intentionally want to delete the PostgreSQL volume and its data.
+All successful create requests return `201 Created`; deleting a beneficiary returns `204 No Content`.
 
-## API examples
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/customers` | Create a customer |
+| `GET` | `/api/customers` | List customers |
+| `GET` | `/api/customers/{id}` | Get a customer |
+| `POST` | `/api/accounts` | Create an account for a customer |
+| `GET` | `/api/accounts` | List accounts |
+| `GET` | `/api/accounts/{accountId}` | Get an account and current balance |
+| `POST` | `/api/accounts/{accountId}/transactions` | Deposit or withdraw |
+| `GET` | `/api/accounts/{accountId}/transactions` | List account transactions |
+| `POST` | `/api/beneficiaries` | Add a beneficiary for a customer |
+| `GET` | `/api/beneficiaries` | List beneficiaries |
+| `DELETE` | `/api/beneficiaries/{id}` | Delete a beneficiary |
 
-### `GET /health`
-
-Checks that the application can execute a simple SQL query.
-
-```json
-{
-  "status": "UP",
-  "database": "UP"
-}
-```
-
-If PostgreSQL is unavailable, the endpoint remains reachable and returns `DOWN` for both fields.
-
-### `GET /api/info`
-
-Returns basic service metadata.
+Create customer body:
 
 ```json
-{
-  "application": "Mini Banking API",
-  "version": "0.0.1-SNAPSHOT",
-  "message": "Week 1 banking service is running"
-}
+{"fullName":"Ada Lovelace","email":"ada@example.com","phone":"555-0100"}
 ```
+
+Create account body:
+
+```json
+{"customerId":1,"initialBalance":100.00}
+```
+
+Transaction body (`type` is `DEPOSIT` or `WITHDRAWAL`):
+
+```json
+{"type":"DEPOSIT","amount":25.00,"description":"Initial deposit"}
+```
+
+Beneficiary body:
+
+```json
+{"customerId":1,"name":"Grace Hopper","accountNumber":"1234567890","bankName":"Example Bank"}
+```
+
+Amounts must be positive for transactions and use at most two decimal places. Withdrawals that would make the balance negative return `422 Unprocessable Entity`. Invalid requests return `400`; unknown resources return `404`; duplicate customer email returns `409`. Error responses include `status`, `message`, `path`, and field-level `validationErrors` when applicable.
 
 ## Postman
 
-Import `postman/mini-banking-week1.postman_collection.json` into Postman. Run the `Health` request first, then `API Info`.
+Import `postman/mini-banking-week2.postman_collection.json`. The create-customer, create-account, and create-beneficiary requests save generated IDs into collection variables. Run those requests before requests that use the IDs.
 
-## Git workflow
+## Persistence model
 
-```powershell
-git init
-git add .
-git commit -m "Create week 1 mini banking service"
-git branch -M main
-git remote add origin <your-repository-url>
-git push -u origin main
-```
+- `customers` stores validated profile data; email is unique.
+- `bank_accounts` belongs to a customer and stores the current decimal balance.
+- `account_transactions` records immutable deposit/withdrawal entries linked to an account.
+- `beneficiaries` belongs to a customer.
 
-Useful daily commands:
+Transactions run atomically and lock the account row while changing its balance. The `schema.sql` file notes that Hibernate currently manages this exercise's schema; a production deployment should use versioned migrations and externally managed secrets.
+
+## Git discipline
+
+Review changes before committing and keep commits focused:
 
 ```powershell
 git status
 git diff
-git add .
-git commit -m "Describe the change"
-git log --oneline --decorate -5
+git add src pom.xml README.md postman
+git commit -m "Add Week 2 banking CRUD APIs"
 ```
-
-## Suggested Week 1 demonstration
-
-1. Show the project structure and explain `pom.xml` dependencies.
-2. Run `mvn test`.
-3. Start PostgreSQL and the application.
-4. Call `/health` and explain the SQL connectivity check.
-5. Call `/api/info` and explain the JSON response.
-6. Import and run the Postman collection.
-7. Show `git status`, a commit, and the README.

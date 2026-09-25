@@ -1,1 +1,2 @@
--- Reserved for the first persistent banking tables in Week 2.
+-- Hibernate maps and creates the Week 2 banking tables from the JPA entities.
+-- This file is intentionally not executed; schema changes are managed by JPA for this exercise.
