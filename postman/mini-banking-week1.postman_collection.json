@@ -1,0 +1,31 @@
+{
+  "info": {
+    "name": "Mini Banking - Week 1",
+    "description": "Basic Week 1 requests for the Mini Banking Spring Boot service.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "API Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/info"
+      }
+    }
+  ]
+}
